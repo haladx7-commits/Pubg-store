@@ -2,12 +2,17 @@ const { Bot, InlineKeyboard } = require("grammy");
 const express = require("express");
 const app = express();
 
-// 1. محرك البوت التلقائي المربوط بالتوكن والـ ID الخاص بك
 const bot = new Bot("8605565677:AAHUYK1LBv3m4d9YXDCCly4UnXwtjGrrVL0");
 const ADMIN_ID = "8876592472"; 
-const CHANNEL_USERNAME = "@alknze"; // تم إضافة معرف قناتك هنا بدقة داخل علامات التنصيص
+const CHANNEL_USERNAME = "@alknze"; 
 
-// 2. ميزة استدعاء البوت بالكلمة المفتاحية للآدمن
+// ✨ التعديل الجديد: الرد التلقائي وإظهار زر فتح المتجر عند كتابة /start ✨
+bot.command("start", async (ctx) => {
+    await ctx.reply("🔥 أهلاً بك في متجر الكنزي المعتمد لشحن شدات ببجي!\n\nاضغط على الزر بالأسفل لفتح المتجر المضيء وبدء الشحن فوراً ⚡", {
+        reply_markup: new InlineKeyboard().webApp("فتح المتجر ⚡", "https://onrender.com")
+    });
+});
+
 bot.hears("لوحة التحكم", async (ctx) => {
     if (ctx.from.id == ADMIN_ID) {
         await ctx.reply("⚡ أهلاً بك يا مدير المتجر، إليك لوحة التحكم السريعة لمتجر ببجي:", {
@@ -18,7 +23,6 @@ bot.hears("لوحة التحكم", async (ctx) => {
     }
 });
 
-// 3. استقبال طلب الشحن اليدوي من المتجر المصغر
 bot.on("web_app_data", async (ctx) => {
     const data = JSON.parse(ctx.webAppData.data);
     await bot.api.sendMessage(ADMIN_ID, `
@@ -33,41 +37,24 @@ bot.on("web_app_data", async (ctx) => {
     });
 });
 
-// 4. معالجة الأزرار والرد التلقائي على الزبون في الخاص وإثبات المصداقية المشفر في القناة
 bot.on("callback_query:data", async (ctx) => {
     const action = ctx.callbackQuery.data;
-    
     if (action.startsWith("approve_")) {
         const [_, playerId, ucAmount, userId] = action.split("_");
-        
-        try {
-            await bot.api.sendMessage(userId, "🚀 **مرحباً بك! تم التحقق من عملية الدفع وشحن حسابك بنجاح. شكراً لثقتك بمتجرنا!**");
-        } catch (err) { console.log(err); }
-        
-        // تشفير الـ ID تلقائياً لحماية الخصوصية
-        const maskedId = playerId.length > 4 
-            ? playerId.substring(0, 3) + "****" + playerId.slice(-1) 
-            : "******";
-        
-        try {
-            await bot.api.sendMessage(CHANNEL_USERNAME, `🎉 **عملية شحن ناجحة جديدة!**\n\nتم شحن باقة **${ucAmount} UC** بنجاح للاعب ID: \`\${maskedId}\`\n\nشكراً لثقتكم بمتجرنا المعتمد ⚡`);
-        } catch (err) { console.log(err); }
-        
+        try { await bot.api.sendMessage(userId, "🚀 **مرحباً بك! تم التحقق من عملية الدفع وشحن حسابك بنجاح. شكراً لثقتك بمتجرنا!**"); } catch (err) { console.log(err); }
+        const maskedId = playerId.length > 4 ? playerId.substring(0, 3) + "****" + playerId.slice(-1) : "******";
+        try { await bot.api.sendMessage(CHANNEL_USERNAME, `🎉 **عملية شحن ناجحة جديدة!**\n\nتم شحن باقة **${ucAmount} UC** بنجاح للاعب ID: \`\${maskedId}\`\n\nشكراً لثقتكم بمتجرنا المعتمد ⚡`); } catch (err) { console.log(err); }
         await ctx.answerCallbackQuery("تم الشحن ونشر الإثبات بالقناة! ✅");
         await ctx.editMessageText(ctx.callbackQuery.message.text + "\n\n🟢 [حالة الطلب: تم القبول والشحن]");
     }
-    
     if (action.startsWith("reject_")) {
         const [_, userId] = action.split("_");
-        try {
-            await bot.api.sendMessage(userId, "⚠️ **نأسف، تم رفض طلب الشحن الخاص بك. السبب: لم يتم العثور على عملية دفع مطابقة. يرجى التواصل مع الدعم الفني.**");
-        } catch (err) { console.log(err); }
+        try { await bot.api.sendMessage(userId, "⚠️ **نأسف، تم رفض طلب الشحن الخاص بك. السبب: لم يتم العثور على عملية دفع مطابقة. يرجى التواصل مع الدعم الفني.**"); } catch (err) { console.log(err); }
         await ctx.answerCallbackQuery("تم الرفض ❌");
         await ctx.editMessageText(ctx.callbackQuery.message.text + "\n\n🔴 [حالة الطلب: تم الرفض]");
     }
 });
 
-// 5. واجهة المتجر المضيئة المدمجة المحمية من اللمس المتعدد والحروف
 const storeHtml = `
 <!DOCTYPE html>
 <html lang="ar">
