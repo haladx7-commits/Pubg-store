@@ -1,0 +1,13 @@
+{
+  "name": "pubg-store-bot",
+  "version": "1.0.0",
+  "description": "PUBG Mobile Store Telegram Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "grammy": "^1.23.0"
+  }
+}
