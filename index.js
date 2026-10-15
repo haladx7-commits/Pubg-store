@@ -6,7 +6,7 @@ const bot = new Bot("8605565677:AAHUYK1LBv3m4d9YXDCCly4UnXwtjGrrVL0");
 const ADMIN_ID = "8876592472"; 
 const CHANNEL_USERNAME = "@alknze"; 
 
-// ✨ التعديل الجديد: الرد التلقائي وإظهار زر فتح المتجر عند كتابة /start ✨
+// تشغيل البوت عند الضغط على /start
 bot.command("start", async (ctx) => {
     await ctx.reply("🔥 أهلاً بك في متجر الكنزي المعتمد لشحن شدات ببجي!\n\nاضغط على الزر بالأسفل لفتح المتجر المضيء وبدء الشحن فوراً ⚡", {
         reply_markup: new InlineKeyboard().webApp("فتح المتجر ⚡", "https://onrender.com")
@@ -132,8 +132,11 @@ const storeHtml = `
 </html>
 `;
 
+// هذا هو الجزء الصحيح والمعدل لعرض الواجهة وحل خلل الـ Render
 app.get("/", (req, res) => {
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.send(storeHtml);
 });
-app.listen(3000, () => { bot.start(); });
+
+app.listen(3000, () => {
+    bot.start();
+});
