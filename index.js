@@ -132,5 +132,8 @@ const storeHtml = `
 </html>
 `;
 
-app.get("/", (req, res) => { res.send(storeHtml); });
+app.get("/", (req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(storeHtml);
+});
 app.listen(3000, () => { bot.start(); });
